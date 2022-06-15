@@ -10,9 +10,11 @@ import { getViewAndModelFromRequestByAliasOrId } from './helpers';
 import apiMetrics from '../../helpers/apiMetrics';
 import getAst from '../../../db/sql-data-mapper/lib/sql/helpers/getAst';
 
+import * as dataAliasServices from '../../../services/data/dataAliasServices';
+
 async function dataList(req: Request, res: Response) {
   const { model, view } = await getViewAndModelFromRequestByAliasOrId(req);
-  res.json(await getDataList(model, view, req));
+  res.json(await dataAliasServices.getDataList(model, view, req));
 }
 
 async function dataFindOne(req: Request, res: Response) {
@@ -88,6 +90,7 @@ async function dataDelete(req: Request, res: Response) {
   }
   res.json(await baseModel.delByPk(req.params.rowId, null, req));
 }
+/*
 async function getDataList(model, view: View, req) {
   const base = await Base.get(model.base_id);
 
@@ -121,6 +124,7 @@ async function getDataList(model, view: View, req) {
     count,
   });
 }
+*/
 
 async function getFindOne(model, view: View, req) {
   const base = await Base.get(model.base_id);
