@@ -18,14 +18,22 @@ const { modelValue } = defineProps<Props>()
 const emit = defineEmits(['update:modelValue'])
 
 const isPublicForm = inject<boolean>('isPublicForm', false)
-const isForm = inject<boolean>('isForm', false)
+const isForm = inject<boolean>('isForm', true)
+const isPublicGrid = inject<boolean>('isPublicGrid', false)
+const isLocked = inject<boolean>('isLocked', false)
 const meta = inject(MetaInj)
 const column = inject(ColumnInj)
 const editEnabled = inject<boolean>('editEnabled', false)
 
+// TODO: _isUIAllowed
+const _isUIAllowed = (view: string) => {
+  return true
+}
+
 const localFilesState = reactive([])
 const attachments = ref([])
 const uploading = ref(false)
+const dialog = ref(false)
 const fileInput = ref<HTMLInputElement>()
 
 const { $api } = useNuxtApp()
@@ -37,6 +45,12 @@ watchEffect(() => {
     attachments.value = ((typeof modelValue === 'string' ? JSON.parse(modelValue) : modelValue) || []).filter(Boolean)
   }
 })
+
+const onOrderUpdate = () => {
+  emit('update:modelValue', JSON.stringify(attachments.value))
+}
+
+const removeItem = () => {}
 
 const selectImage = (file: any, i) => {
   // todo: implement
@@ -165,6 +179,63 @@ const onFileSelection = async (e) => {
 
     <input ref="fileInput" type="file" multiple class="d-none" @change="onFileSelection" />
   </div>
+  <v-dialog v-if="dialog" v-model="dialog" width="800">
+    <v-card class="h-100 images-modal">
+      <v-card-text class="h-100 backgroundColor">
+        <div class="d-flex mx-2">
+          <v-btn
+            v-if="(isForm || _isUIAllowed('tableAttachment')) && !isPublicGrid && !isLocked"
+            small
+            class="my-4"
+            :loading="uploading"
+            @click="addFile"
+          >
+            <v-icon small class="mr-2"> mdi-link-variant </v-icon>
+            <span class="caption">Attach File</span>
+          </v-btn>
+
+          <!--            <v-text-field v-model="urlString" @keypress.enter="uploadByUrl" /> -->
+        </div>
+
+        <div class="d-flex flex-wrap h-100">
+          <v-container fluid style="max-height: calc(90vh - 80px); overflow-y: auto">
+            <draggable v-model="attachments" class="row" @update="onOrderUpdate">
+              <v-col v-for="(item, i) in isPublicForm ? localFilesState : attachments" :key="i" cols="4">
+                <v-card class="modal-thumbnail-card align-center justify-center d-flex" height="200px" style="position: relative">
+                  <v-icon
+                    v-if="_isUIAllowed('tableAttachment') && !isPublicGrid && !isLocked"
+                    small
+                    class="remove-icon"
+                    @click="removeItem(i)"
+                  >
+                    mdi-close-circle
+                  </v-icon>
+                  <v-icon color="grey" class="download-icon" @click.stop="downloadItem(item, i)"> mdi-download </v-icon>
+                  <div class="pa-2 d-flex align-center" style="height: 200px">
+                    <img
+                      v-if="isImage(item.title, item.mimetype)"
+                      style="max-height: 100%; max-width: 100%"
+                      alt="#"
+                      :src="item.url || item.data"
+                      @click="selectImage(item.url, i)"
+                    />
+
+                    <v-icon v-else-if="item.icon" size="33" @click="openUrl(item.url || item.data, '_blank')">
+                      {{ item.icon }}
+                    </v-icon>
+                    <v-icon v-else size="33" @click="openUrl(item.url || item.data, '_blank')"> mdi-file </v-icon>
+                  </div>
+                </v-card>
+                <p class="caption mt-2 modal-title" :title="item.title">
+                  {{ item.title }}
+                </p>
+              </v-col>
+            </draggable>
+          </v-container>
+        </div>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style scoped lang="scss">
