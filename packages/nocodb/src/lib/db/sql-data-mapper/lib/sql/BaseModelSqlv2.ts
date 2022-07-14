@@ -362,7 +362,7 @@ class BaseModelSqlv2 {
     qb.groupBy(args.column_name);
     if (sorts) await sortV2(sorts, qb, this.dbDriver);
     applyPaginate(qb, rest);
-    let data = await qb;
+    const data = await qb;
     return data;
   }
 
@@ -979,7 +979,7 @@ class BaseModelSqlv2 {
     applyPaginate(qb, rest);
 
     const proto = await childModel.getProto();
-    let data = await this.extractRawQueryAndExec(qb);
+    const data = await this.extractRawQueryAndExec(qb);
 
     return data.map((c) => {
       c.__proto__ = proto;
@@ -1079,7 +1079,7 @@ class BaseModelSqlv2 {
     applyPaginate(qb, rest);
 
     const proto = await parentModel.getProto();
-    let data = await this.extractRawQueryAndExec(qb);
+    const data = await this.extractRawQueryAndExec(qb);
 
     return data.map((c) => {
       c.__proto__ = proto;
@@ -1258,23 +1258,7 @@ class BaseModelSqlv2 {
   }
 
   _getListArgs(args: XcFilterWithAlias): XcFilter {
-    const obj: XcFilter = {};
-    obj.where = args.where || args.w || '';
-    obj.having = args.having || args.h || '';
-    obj.shuffle = args.shuffle || args.r || '';
-    obj.condition = args.condition || args.c || {};
-    obj.conditionGraph = args.conditionGraph || {};
-    obj.limit = Math.max(
-      Math.min(
-        args.limit || args.l || this.config.limitDefault,
-        this.config.limitMax
-      ),
-      this.config.limitMin
-    );
-    obj.offset = Math.max(+(args.offset || args.o) || 0, 0);
-    obj.fields = args.fields || args.f || '*';
-    obj.sort = args.sort || args.s || this.model.primaryKey?.[0]?.tn;
-    return obj;
+    return getListArgs(args, this.model)
   }
 
   public async shuffle({ qb }: { qb: QueryBuilder }): Promise<void> {
@@ -2324,6 +2308,7 @@ export function getListArgs(args: XcFilterWithAlias, model: Model): XcFilter {
   const obj: XcFilter = {};
   obj.where = args.where || args.w || '';
   obj.having = args.having || args.h || '';
+  obj.shuffle = args.shuffle || args.r || '';
   obj.condition = args.condition || args.c || {};
   obj.conditionGraph = args.conditionGraph || {};
   obj.limit = Math.max(
