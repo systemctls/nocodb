@@ -2309,21 +2309,21 @@ function getCompositePk(primaryKeys: Column[], row) {
 
 export function getListArgs(args: XcFilterWithAlias, model: Model): XcFilter {
   const obj: XcFilter = {};
-  obj.where = args.where || args.w || '';
-  obj.having = args.having || args.h || '';
-  obj.shuffle = args.shuffle || args.r || '';
-  obj.condition = args.condition || args.c || {};
-  obj.conditionGraph = args.conditionGraph || {};
+  obj.where = args?.where || args?.w || '';
+  obj.having = args?.having || args?.h || '';
+  obj.shuffle = args?.shuffle || args?.r || '';
+  obj.condition = args?.condition || args?.c || {};
+  obj.conditionGraph = args?.conditionGraph || {};
   obj.limit = Math.max(
     Math.min(
-      args.limit || args.l || BaseModelSqlv2.config.limitDefault,
+      args?.limit || args?.l || BaseModelSqlv2.config.limitDefault,
       BaseModelSqlv2.config.limitMax
     ),
     BaseModelSqlv2.config.limitMin
   );
-  obj.offset = Math.max(+(args.offset || args.o) || 0, 0);
-  obj.fields = args.fields || args.f || '*';
-  obj.sort = args.sort || args.s || model.primaryKey?.[0]?.tn;
+  obj.offset = Math.max(+(args?.offset || args?.o) || 0, 0);
+  obj.fields = args?.fields || args?.f || '*';
+  obj.sort = args?.sort || args?.s || model.primaryKey?.[0]?.tn;
   return obj;
 }
 
