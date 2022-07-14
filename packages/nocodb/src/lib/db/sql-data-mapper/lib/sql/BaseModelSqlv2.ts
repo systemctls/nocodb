@@ -571,7 +571,10 @@ class BaseModelSqlv2 {
     }
   }
 
-  public async multipleMmList({ colId, parentIds }, args: { limit?; offset? } = {}) {
+  public async multipleMmList(
+    { colId, parentIds },
+    args: { limit?; offset? } = {}
+  ) {
     const { where, ...rest } = this._getListArgs(args as any);
     const relColumn = (await this.model.getColumns()).find(
       (c) => c.id === colId
@@ -1258,7 +1261,7 @@ class BaseModelSqlv2 {
   }
 
   _getListArgs(args: XcFilterWithAlias): XcFilter {
-    return getListArgs(args, this.model)
+    return getListArgs(args, this.model);
   }
 
   public async shuffle({ qb }: { qb: QueryBuilder }): Promise<void> {

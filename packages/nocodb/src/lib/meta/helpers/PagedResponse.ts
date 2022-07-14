@@ -8,13 +8,16 @@ const config: any = {
 export class PagedResponseImpl<T> {
   constructor(
     list: T[],
-    args: { limit?: number; offset?: number; count?: number, l?: number, o?: number } = {}
+    args: {
+      limit?: number;
+      offset?: number;
+      count?: number;
+      l?: number;
+      o?: number;
+    } = {}
   ) {
     const limit = Math.max(
-      Math.min(
-        args.limit || args.l || config.limitDefault,
-        config.limitMax
-      ),
+      Math.min(args.limit || args.l || config.limitDefault, config.limitMax),
       config.limitMin
     );
     const offset = Math.max(+(args.offset || args.o) || 0, 0);
